@@ -1,0 +1,53 @@
+@if (isOpen) {
+    <div class="modal-backdrop" role="presentation" (click)="closeModal()">
+        <section class="summary-modal" role="dialog" aria-modal="true" aria-labelledby="global-summary-title" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2 id="global-summary-title">Global Summary</h2>
+                <button type="button" class="btn btn-sm btn-outline-secondary" aria-label="Close" title="Close" (click)="closeModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="summary-section">
+                <h3>Global Production</h3>
+                @if (globalProduction.length > 0) {
+                    <table>
+                        <thead>
+                            <tr><th>Product</th><th>Total</th></tr>
+                        </thead>
+                        <tbody>
+                            @for (production of globalProduction; track production.productName) {
+                                <tr>
+                                    <td><img [src]="getProductIcon(production.productName)" alt="" /> {{ production.productName }}</td>
+                                    <td>{{ production.amount | number: '1.0-2' }}</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                } @else {
+                    <p>No production configured.</p>
+                }
+            </div>
+
+            <div class="summary-section">
+                <div class="section-heading">
+                    <h3>Global Army</h3>
+                    <strong>{{ totalArmyCount | number }}</strong>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Unit</th><th>Total</th></tr>
+                    </thead>
+                    <tbody>
+                        @for (unit of globalUnitCounts; track unit.unitName) {
+                            <tr>
+                                <td><img [src]="unit.icon" alt="" /> {{ unit.unitName }}</td>
+                                <td>{{ unit.count | number }}</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+}

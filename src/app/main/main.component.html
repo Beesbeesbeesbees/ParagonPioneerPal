@@ -1,0 +1,240 @@
+@if (openCalculatorIsland === null) {
+    <div class="island-container">
+        @for (island of islands(); track $index) {
+            <span class="island" [class.minimized]="island.isMinimized">
+                <div class="island-header">
+                    @if (island.isMinimized) {
+                        <span class="island-name">{{ island.name }}</span>
+                    }
+                    @else {
+                        <input class="island-name" type="text" [(ngModel)]="island.name" (ngModelChange)="onUpdate()" selectInputText />
+                    }
+                    <button type="button"
+                        class="btn btn-sm btn-primary"
+                        [aria-label]="island.isMinimized ? 'Maximize' : 'Minimize'"
+                        [title]="island.isMinimized ? 'Maximize' : 'Minimize'"
+                        (click)="island.isMinimized = !island.isMinimized; this.onUpdate();">
+                        <i class="bi" [class.bi-arrows-collapse]="!island.isMinimized" [class.bi-fullscreen-exit]="island.isMinimized"></i>
+                    </button>   
+                </div>
+                @if (!island.isMinimized) {
+
+
+
+                    @if (island.population !== null) {
+                        <div class="island-population">
+                            @for (populationType of populationTypes; track populationType) {
+                                <span class="population-container">
+                                    <img [src]="populations.get(populationType)?.icon" alt="{{ populationType }}" class="unit-icon" />
+                                    <input type="number" [ngModel]="island.population[populationType]" (ngModelChange)="islandService.onPopulationUpdate(island, populationType, $event); this.onUpdate();" selectInputText />
+                                </span>
+                            }
+
+                            <delete-with-confirmation
+                                (onDelete)="islandService.removePopulation(island); this.onUpdate();">
+                            </delete-with-confirmation>
+                        </div>
+                    }
+                    @if (island.production.length > 0) {
+                        <div class="production-container">
+                            <table>
+                                <tr class="table-header">
+                                    <td colspan="1" class="center-align">Product</td>
+                                    <td colspan="1">Need</td>
+                                    <td colspan="1" class="center-align">Import</td>
+                                    <td colspan="2" class="right-align">Building</td>
+                                    <td colspan="3" class="center-align">Built</td>
+                                    <td colspan="1">Fields</td>
+                                    <td colspan="1">Defecit</td>
+                                </tr>
+                                @for (production of islandService.flattenProduction(island); track $index) {
+                                    <tr 
+                                        [hidden]="production.nodeDepth > 0 && production.productAmount === 0"
+                                        [class.satisfied]="production.buildingsConstructed >= production.buildingsNeeded"
+                                        [class.warning]="production.buildingsConstructed < production.buildingsNeeded && production.buildingsConstructed >= production.buildingsNeeded * 0.9"
+                                        [class.error]="production.buildingsConstructed < production.buildingsNeeded * 0.9">
+                                        <td>
+                                            <span class="spacer" [style.width]="production.nodeDepth * 20 + 'px'">&nbsp;</span>
+                                            <img [src]="productIconMap[production.productName]" alt="{{ production.productName }}" />
+                                            <span> {{ production.productName }}</span>
+                                        </td>
+                                        @if (production.fromPopulation || production.nodeDepth > 0) {
+                                            <td>{{ production.productAmount | number: '1.0-2' }}</td>
+                                        }
+                                        @else {
+                                            <td><input type="number" [(ngModel)]="production.productAmount" (ngModelChange)="productionService.recalculateNode(production); onUpdate();" selectInputText /></td>
+                                        }
+                                        <td>
+                                            <input
+                                                class="trade-balance"
+                                                [class.error]="tradeService.getProductTradeBalance(production.productName) !== 0"
+                                                [title]="'Global Trade Balance: ' + tradeService.getProductTradeBalance(production.productName)"
+                                                type="number"
+                                                [(ngModel)]="production.tradeBalance"
+                                                (ngModelChange)="productionService.recalculateNode(production); tradeService.calculateTradeBalance(islands()); onUpdate();"
+                                                selectInputText />
+                                            <button type="button"
+                                                class="btn btn-sm"
+                                                aria-label="Ship Management"
+                                                title="Ship Management"
+                                                (click)="openShipManagement(production)">
+                                                <i class="bi bi-water"></i>
+                                            </button>   
+                                        </td>
+                                        <td>
+                                            @if (production.alternateRecipes.length > 0) {
+                                                <button type="button"
+                                                    class="btn btn-sm"
+                                                    aria-label="Cycle Recipe"
+                                                    title="Cycle Recipe"
+                                                    (click)="productionService.toggleRecipe(production); onUpdate();">
+                                                    <i class="bi bi-arrow-repeat"></i>
+                                                </button>   
+                                            }
+                                        </td>
+                                        <td class="right-align">
+                                            {{ production.selectedRecipe.name }}
+                                            <img [src]="recipeIconMap[production.selectedRecipe.name]" alt="{{ production.selectedRecipe.name }}" />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="number"
+                                                [(ngModel)]="production.buildingsConstructed"
+                                                (ngModelChange)="productionService.recalculateNode(production); islandAggregatorService.updateIsland(island); onUpdate();"
+                                                selectInputText /> / 
+                                        </td>
+                                        <td>
+                                            {{ production.buildingsNeeded | number: '1.0-2' }}
+                                        </td>                                    
+                                        <td class="small-text" title="Island-Wide Constructed Count">
+                                            @if (!production.fieldsDisplay && islandAggregatorService.getBuildingsConstructed(production.selectedRecipe.name, island) !== production.buildingsConstructed) {
+                                                <span>({{ islandAggregatorService.getBuildingsConstructed(production.selectedRecipe.name, island) }})</span>
+                                            }
+                                            @else if (production.fieldsDisplay && islandAggregatorService.getBuildingsConstructed(production.selectedRecipe.name, island) !== production.buildingsConstructed * production.selectedRecipe.fieldCount!) {
+                                                <span>({{ islandAggregatorService.getBuildingsConstructed(production.selectedRecipe.name, island) * production.selectedRecipe.fieldCount! }})</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (production.selectedRecipe.fieldCount !== null) {
+                                                <button type="button"
+                                                    class="btn btn-sm"
+                                                    aria-label="Field View"
+                                                    title="Field View"
+                                                    (click)="productionService.toggleFieldView(production); onUpdate();">
+                                                    <i [class.bi-flower2]="production.fieldsDisplay" [class.bi-building]="!production.fieldsDisplay" class="bi"></i>
+                                                </button>   
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (production.defecit > 0) {
+                                                {{ production.defecit | number: '1.0-2' }}
+                                            }
+                                        </td>
+                                        <td class="widget-row">
+                                            @if (production.nodeDepth === 0) {
+                                                <button type="button"
+                                                    class="btn btn-sm btn-light"
+                                                    aria-label="Move Up"
+                                                    title="Move Up"
+                                                    (click)="moveProduction(island, production, -1);">
+                                                    <i class="bi bi-arrow-up"></i>
+                                                </button>
+                                                <button type="button"
+                                                    class="btn btn-sm btn-light"
+                                                    aria-label="Move Down"
+                                                    title="Move Down"
+                                                    (click)="moveProduction(island, production, 1);">
+                                                    <i class="bi bi-arrow-down"></i>
+                                                </button>
+                                                <delete-with-confirmation
+                                                    (onDelete)="islandService.removeProduction(production, island); this.onUpdate();">
+                                                </delete-with-confirmation>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </table>
+                        </div>
+                    }
+                    <div class="island-toolbar">
+                        <button class="btn btn-primary" (click)="toggleProductPicker(island)">
+                            <i class="bi bi-tools"></i>
+                            <span> Add Product</span>
+                        </button>
+                        @if (productPickerIsland === island) {
+                            <div class="product-picker">
+                                <input type="search"
+                                    [(ngModel)]="productSearchTerm"
+                                    placeholder="Search building or product"
+                                    aria-label="Search products"
+                                    autofocus
+                                    selectInputText />
+                                <div class="product-picker-options">
+                                    @for (recipe of filteredRecipes; track recipe.name) {
+                                        <button type="button" class="product-picker-option" (click)="addProduct(island, recipe)">
+                                            <img [src]="recipeIconMap[recipe.name]" alt="" />
+                                            <span>
+                                                <strong>{{ recipe.name }}</strong>
+                                                <small>{{ recipe.productType }}</small>
+                                            </span>
+                                        </button>
+                                    }
+                                    @if (filteredRecipes.length === 0) {
+                                        <span class="product-picker-empty">No products found</span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        @if (island.population === null) {
+                            <button class="btn btn-primary" (click)="islandService.addPopulation(island); this.onUpdate();">
+                                <i class="bi bi-person-fill-add"></i>
+                                <span> Add Population</span>
+                            </button>
+                        }
+                        <button class="btn btn-primary" (click)="openBattleInterface(island)">
+                            <i class="bi bi-shield-slash-fill"></i>
+                            <span> Battle</span>
+                        </button>
+
+                        <delete-with-confirmation
+                            (onDelete)="removeIsland(island); tradeService.calculateTradeBalance(islands());">
+                        </delete-with-confirmation>
+                    </div>
+                }
+            </span>
+        }   
+    </div>
+
+    <div class="bottom-row">
+        <button class="btn btn-primary" (click)="importSave()">
+            <i class="bi bi-box-arrow-in-down"></i>
+            <span> Import Save</span>
+        </button>
+        <button class="btn btn-primary" (click)="exportSave()">
+            <i class="bi bi-box-arrow-up-right"></i>
+            <span> Export Save</span>
+        </button>
+        <button class="btn btn-primary" (click)="addIsland()">
+            <i class="bi bi-person-fill-add"></i>
+            <span> Add Island</span>
+        </button>
+        <button class="btn btn-primary" type="button" (click)="globalSummaryOpen = true">
+            <i class="bi bi-bar-chart-fill"></i>
+            <span> Global Summary</span>
+        </button>
+    </div>
+
+}
+
+
+@if (openCalculatorIsland !== null) {
+    <battle-calculator [playerUnitsAvailableInterface]="openCalculatorIsland.army" (onClose)="closeBattleInterface()" (onUpdate)="onUpdate()"></battle-calculator>
+}
+
+@if (openShipManagementProduction !== null) {
+    <ship-management
+        [node]="openShipManagementProduction"
+        (close)="closeShipManagement()" (onUpdate)="onUpdate()"></ship-management>
+}
+
+<global-summary [islands]="islands()" [isOpen]="globalSummaryOpen" (close)="closeGlobalSummary()"></global-summary>

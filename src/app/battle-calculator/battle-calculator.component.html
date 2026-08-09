@@ -1,0 +1,244 @@
+<form ngNoForm (submit)="calculate(); $event.preventDefault()">
+  <div class="table-row">
+    <span>
+      <div class="panel-header">
+        <h2>Units Available</h2>
+        <button type="button"
+          class="btn btn-sm btn-outline-secondary clear-button"
+          aria-label="Clear human count" 
+          title="Clear human count"
+          (click)="clearHumanCount()">
+          <i class="bi bi-eraser-fill"></i>
+        </button>
+      </div>
+      <table class="input-table unit-input">
+        @for (unit of playerUnitsAvailableInterface | keyvalue: unitSorter; track $index) {
+          <tr>
+            <td>{{ unit.key }}</td>
+            <td><img [src]="getUnitIconByName(unit.key)" alt="{{ unit.key }}" class="unit-icon"></td>
+            <td>
+              <input type="number" class="form-control"
+                [(ngModel)]="playerUnitsAvailableInterface[unit.key]" min="0"
+                selectInputText
+                (ngModelChange)="onUpdate.emit()" />
+            </td>
+          </tr>
+        }
+      </table>
+      <div class="unit-input">
+        <button class="btn btn-primary" type="submit" [disabled]="!canCalculate()">
+          Calculate
+        </button>
+      </div>
+    </span>
+    <span>
+      <div class="panel-header">
+        <h2>Enemy Count</h2>
+        <button type="button"
+            class="btn btn-sm btn-outline-secondary clear-button"
+            aria-label="Clear enemy count" 
+            title="Clear enemy count"
+            (click)="clearEnemyCount()">
+          <i class="bi bi-eraser-fill"></i>
+        </button>        
+      </div>
+      <table class="input-table unit-input">
+        @for (unit of enemyCountInterface | keyvalue: unitSorter; track $index) {
+          <tr>
+            <td>{{ unit.key }}</td>
+            <td><img [src]="getUnitIconByName(unit.key)" alt="{{ unit.key }}" class="unit-icon"></td>
+            <td><input type="number" class="form-control" [(ngModel)]="enemyCountInterface[unit.key]" min="0" selectInputText></td>
+          </tr>
+        }
+      </table>
+    </span>
+    <span class="simulation-container small-text">
+      @for (simulation of simulations; track $index) {
+        <span class="simulation" [class.invalid]="simulation.isInvalid">
+          <div class="unit-row">
+            @for (enemyDef of simulation.enemyArmyDef | keyvalue: unitSorterByOrder; track $index) {
+              <span>
+                <img [src]="enemyDef.value.unit.icon" alt="{{ enemyDef.value.unit.name }}" class="small-unit-icon">
+                <span>{{ enemyDef.value.count }}</span>
+              </span>
+            }
+          </div>
+          @if (!simulation.bestWinResult && !simulation.bestLossResult) {
+            <div>{{ simulation.progressText() }}</div>
+            @if ((simulation.progressDenominator() || 0) > 0) {
+              <div class="progress">
+                <div class="progress-bar"
+                  role="progressbar"
+                  [style.width]="math.floor(simulation.progressNumerator()! / simulation.progressDenominator()! * 100) + '%'"
+                  [aria-valuenow]="math.floor(simulation.progressNumerator()! / simulation.progressDenominator()! * 100)"
+                  aria-valuemin="0"
+                  aria-valuemax="100">
+                    {{ simulation.progressNumerator() }} / {{ simulation.progressDenominator() }}
+                  </div>
+              </div>
+            }
+          }
+          @if (simulation.bestWinResult) {
+            <table class="small-text">
+              <tr><td>Best Win </td><td class="bold-text">{{ simulation.bestWinResult.aggregatedWinPercent * 100 | number }}%</td></tr>
+              <tr><td>Loss Value </td><td>{{ simulation.bestWinResult.aggregatedLossScore | number }}</td></tr>
+              <tr><td>Time </td><td>{{ simulation.bestWinResult.battleSecondsFriendlyText }}</td></tr>
+            </table>
+            <div class="unit-row">
+              @for (unitDef of simulation.bestWinResult.playerArmy | keyvalue: unitSorterByOrder; track $index) {
+                <span>
+                  <div>
+                    <img [src]="unitDef.value.unit.icon" alt="{{ unitDef.value.unit.name }}" class="small-unit-icon">
+                    <span>{{ unitDef.value.count }}</span>
+                  </div>
+                  <div class="unit-loss tiny-text">
+                    <span>-{{ simulation.bestWinResult.averagePlayerUnitLossMap.get(unitDef.value.unit.name) || 0 | number: '1.0-2' }}</span>
+                  </div>
+                </span>
+              }
+              <button type="button"
+                class="btn btn-sm btn-success"
+                aria-label="Accept Simulation"
+                title="Accept Simulation"
+                (click)="acceptSimulation(simulation, true)">
+                <i class="bi bi-check-circle-fill"></i>
+              </button>
+            </div>
+          }
+          @if (simulation.bestLossResult) {
+            <table class="small-text">
+              <tr><td colspan="2">Best Non-Guaranteed</td><td class="bold-text">{{ simulation.bestLossResult.aggregatedWinPercent * 100 | number }}%</td></tr>
+              <tr>
+                <td>Loss Value </td><td>{{ simulation.bestLossResult.aggregatedLossScore | number }}</td>
+                <td>Kill Value </td><td>{{ simulation.bestLossResult.aggregatedKillScore | number }}</td>
+              </tr>
+              <tr><td>Time</td><td>{{ simulation.bestLossResult.battleSecondsFriendlyText }}</td></tr>
+            </table>
+            <div class="unit-row">
+              @for (unitDef of simulation.bestLossResult.playerArmy | keyvalue: unitSorterByOrder; track $index) {
+                <span>
+                  <div>
+                    <img [src]="unitDef.value.unit.icon" alt="{{ unitDef.value.unit.name }}" class="small-unit-icon">
+                    <span>{{ unitDef.value.count }}</span>
+                  </div>
+                  <div class="unit-loss tiny-text">
+                    <span>-{{ simulation.bestLossResult.averagePlayerUnitLossMap.get(unitDef.value.unit.name) || 0 | number: '1.0-2' }}</span>
+                  </div>
+                </span>
+              }
+              <button type="button"
+                class="btn btn-sm btn-success"
+                aria-label="Accept Simulation"
+                title="Accept Simulation"
+                (click)="acceptSimulation(simulation, false)">
+                <i class="bi bi-check-circle-fill"></i>
+              </button>
+            </div>
+            <div class="unit-row">
+              @for (unitDef of simulation.bestLossResult.enemyArmy | keyvalue: unitSorterByOrder; track $index) {
+                <span>
+                  <div>
+                    <img [src]="unitDef.value.unit.icon" alt="{{ unitDef.value.unit.name }}" class="small-unit-icon">
+                    <div class="unit-loss tiny-text">
+                      <span class="unit-loss">-{{ simulation.bestLossResult.averageEnemyUnitLossMap.get(unitDef.value.unit.name) || 0 | number: '1.0-2' }}</span>
+                    </div>
+                  </div>
+                </span>
+              }
+            </div>
+          }
+          <div class="simulation-toolbar">
+            <button type="button"
+              class="btn btn-sm btn-danger"
+              aria-label="Delete"
+              title="Delete"
+              (click)="deleteSimulation(simulation)">
+              <i class="bi bi-trash-fill"></i>
+            </button>   
+            <button type="button"
+              class="btn btn-sm btn-outline-secondary"
+              aria-label="Recalculate" 
+              title="Recalculate"
+              (click)="recalculateSimulation(simulation)">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+          </div>
+        </span>
+      }
+    </span>
+    <span>
+      <button class="btn btn-primary" type="button" (click)="onClose.emit()">
+        Close
+      </button>
+    </span>
+  </div>
+
+
+  <br />
+
+  <div class="table-row">
+    <span>
+      <h2>Unit Value</h2>
+      <table class="input-table">
+        @for (unit of playerUnitValueInterface | keyvalue: unitSorter; track $index) {
+          <tr>
+            <td>{{ unit.key }}</td>
+            <td><img [src]="getUnitIconByName(unit.key)" alt="{{ unit.key }}" class="unit-icon"></td>
+            <td><input type="number" class="form-control" [(ngModel)]="playerUnitValueInterface[unit.key]" min="0" step="0.01" selectInputText></td>
+          </tr>
+        }
+      </table>
+    </span>
+      <span>
+      <h2>Enemy Unit Value</h2>
+      <table class="input-table">
+        @for (unit of enemyUnitValueInterface | keyvalue: unitSorter; track $index) {
+          <tr>
+            <td>{{ unit.key }}</td>
+            <td><img [src]="getUnitIconByName(unit.key)" alt="{{ unit.key }}" class="unit-icon"></td>
+            <td><input type="number" class="form-control" [(ngModel)]="enemyUnitValueInterface[unit.key]" min="0" step="0.01" selectInputText></td>
+          </tr>
+        }
+      </table>
+    </span>
+    <span>
+      <h2>Simulation Options</h2>
+      <table class="input-table">
+        <tr>
+          <td>Win Threshold</td>
+          <td><input type="number" class="form-control" [(ngModel)]="simulationSettingsService.settings.winThreshold" min="0" step="0.0001"></td>
+        </tr>
+        <tr>
+          <td>Maximum Battle States Tracked</td>
+          <td><input type="number" class="form-control" [(ngModel)]="simulationSettingsService.settings.maxBattleStatesTracked" min="0" step="1"></td>
+        </tr>
+        <tr>
+          <td>Maximum Initial Simulations</td>
+          <td><input type="number" class="form-control" [(ngModel)]="simulationSettingsService.settings.maxInitialSims" min="0" step="1"></td>
+        </tr>
+        <tr>
+          <td>Maximum CPU Threads</td>
+          <td><input type="number" class="form-control" [(ngModel)]="simulationSettingsService.settings.maxThreads" min="1" step="1" required="false"></td>
+        </tr>
+        <tr>
+          <td colspan="2">For guaranteed winnable battles:</td>
+        </tr>
+        <tr>
+          <td>Hour of Battle Time : Unit Value Loss weight</td>
+          <td><input type="number" class="form-control" [(ngModel)]="simulationSettingsService.settings.winHourPerLossScoreWeight" min="0" step="0.0001"></td>
+        </tr>
+        <tr>
+          <td colspan="2">For non-guaranteed winnable battles:</td>
+        </tr>
+        <tr>
+          <td>Hour of Battle Time : Enemy Unit Value Killed weight</td>
+          <td><input type="number" class="form-control" [(ngModel)]="simulationSettingsService.settings.lossHourPerKillScoreWeight" min="0" step="0.0001"></td>
+        </tr>
+        <tr>
+          <td>Unit Value Loss : Enemy Unit Value Killed weight</td>
+          <td><input type="number" class="form-control" [(ngModel)]="simulationSettingsService.settings.lossLossScoreWeight" min="0" step="0.0001"></td>
+        </tr>
+      </table>
+    </span>
+  </div>
+</form>

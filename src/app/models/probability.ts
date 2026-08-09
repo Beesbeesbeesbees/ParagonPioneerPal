@@ -1,0 +1,1 @@
+export type ProbabilityValueMap<TKey extends string | number | symbol, TRecord> = Map<TKey, { record: TRecord, probability: number }>;

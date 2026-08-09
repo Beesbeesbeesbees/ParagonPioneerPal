@@ -1,0 +1,54 @@
+<div class="modal d-block" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="ship-management-title">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="ship-management-title">Ship Management</h2>
+                <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-sm align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col">Ship</th>
+                            <th scope="col">Capacity</th>
+                            <th scope="col">Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (shipType of shipTypes; track shipType) {
+                            <tr>
+                                <td>
+                                    <img [src]="getShipIcon(shipType)" [alt]="shipType" class="ship-icon" />
+                                    {{ shipType }}
+                                </td>
+                                <td>{{ shipCatalog[shipType].tradeCapacity }}</td>
+                                <td>
+                                    <input
+                                        class="form-control form-control-sm ship-count"
+                                        type="number"
+                                        min="0"
+                                        [ngModel]="getShipCount(shipType)"
+                                        (ngModelChange)="setShipCount(shipType, $event)" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <span class="progress-tracker"
+                    [style.background-image]="'linear-gradient(0deg, ' 
+                        + (totalCapacity >= math.abs(node.tradeBalance) ? 'lightgreen'
+                            : (totalCapacity < math.abs(node.tradeBalance) && totalCapacity >= math.abs(node.tradeBalance) * 0.9) ? 'lightyellow'
+                            : 'lightcoral')
+                        + ' '
+                        + totalCapacity / math.abs(node.tradeBalance) * 100 + '%,'
+                        + ' transparent ' 
+                        + totalCapacity / math.abs(node.tradeBalance) * 100 + '% '
+                        + (100 - (totalCapacity / math.abs(node.tradeBalance) * 100)) + '%)'">
+                    <span>{{ totalCapacity + " / " + math.abs(node.tradeBalance) }}</span>
+                    <span>{{ totalCapacity / math.abs(node.tradeBalance) * 100 | number: "0.0-2" }}%</span>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-backdrop show" (click)="closeModal()"></div>

@@ -1,0 +1,22 @@
+<span class="button-container">
+    <button
+        type="button"
+        class="btn btn-sm"
+        [class.btn-danger]="!deleteUnlocked()"
+        [class.btn-outline-danger]="deleteUnlocked()"
+        [disabled]="deleteUnlocked()"
+        (click)="unlockDelete(10)"
+        aria-label="Confirm Deletion">
+        <span class="bi" [class.bi-lock-fill]="!deleteUnlocked()" [class.bi-unlock-fill]="deleteUnlocked()" aria-hidden="true"></span>
+    </button>
+    <button
+        type="button"
+        class="btn btn-sm"
+        [class.btn-danger]="deleteUnlocked()"
+        [class.btn-outline-danger]="!deleteUnlocked()"
+        [disabled]="!deleteUnlocked()"
+        (click)="confirmDelete()"
+        aria-label="Delete">
+        <span class="bi bi-trash-fill" aria-hidden="true"></span>
+    </button>
+</span>
