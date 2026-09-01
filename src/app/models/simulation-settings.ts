@@ -19,7 +19,7 @@ export class SimulationSettingDefaults {
             winThreshold: 0.999,
             maxBattleStatesTracked: 1000,
             winHourPerLossScoreWeight: 2,
-            lossLossScoreWeight: 0.9,
+            lossLossScoreWeight: 0.5,
             lossHourPerKillScoreWeight: 2,
             maxInitialSims: 2000,
             maxThreads: null,
