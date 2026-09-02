@@ -1,9 +1,9 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Island } from '../models/island';
-import { ProductType, productIconMap } from '../models/product';
-import { unitInfoByName } from '../models/unitTypes';
-import { IslandService } from '../services/island-service';
+import { Island } from '../../models/island';
+import { ProductType, productIconMap } from '../../models/product';
+import { unitInfoByName } from '../../models/unitTypes';
+import { IslandService } from '../../services/island-service';
 
 type GlobalProduction = {
   productName: ProductType;

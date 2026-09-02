@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ShipConfiguration, ShipConfigurationStatic, ShipType, tradeShips } from '../models/ship-trade';
-import { ProductionNode } from '../models/production-node';
+import { ShipConfiguration, ShipConfigurationStatic, ShipType, tradeShips } from '../../models/ship-trade';
+import { ProductionNode } from '../../models/production-node';
 import { DecimalPipe } from '@angular/common';
 
 @Component({
@@ -22,6 +22,7 @@ export class ShipManagementComponent implements OnInit {
 
     totalCapacity: number = 0;
     math = Math;
+    getShipCapacity = ShipConfigurationStatic.getShipCapacity;
 
     readonly shipTypes = Object.keys(tradeShips) as ShipType[];
     readonly shipCatalog = tradeShips;
@@ -54,7 +55,7 @@ export class ShipManagementComponent implements OnInit {
         this.totalCapacity = 0;
         for (const ship of Object.entries(this.node.tradeConfiguration)) {
             const shipKey = ship[0] as ShipType;
-            this.totalCapacity += ship[1] * ShipConfigurationStatic.getShipCapacity(shipKey)
+            this.totalCapacity += ship[1] * this.getShipCapacity(shipKey)
         }
     }
 }

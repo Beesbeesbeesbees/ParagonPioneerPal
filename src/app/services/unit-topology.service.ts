@@ -1,9 +1,9 @@
 import { ArmyDefinition } from "../models/army";
 import { UnitInfo } from "../models/unitTypes";
+import { SimulationSettingsService } from "./simulation-settings.service";
 
 export class UnitTopologyService {
     private static instance: UnitTopologyService;
-    armyLimit: number = 100;
 
     private constructor() {}
 
@@ -27,9 +27,11 @@ export class UnitTopologyService {
     }
 
     generateTopology(armyDef: ArmyDefinition, topologySteps: number): TopologyPoint[] {
+        const armyLimit = this.getArmyLimit();
+        
         const topologyDimensions = armyDef.filter(a => a.count > 0).map((unit) => {
             const result: { steps: number[] } = { steps: [] };
-            const maxCount = Math.min(unit.count, this.armyLimit);
+            const maxCount = Math.min(unit.count, armyLimit);
             
             for (let i = 0; i <= maxCount; i += Math.max(Math.min(topologySteps, maxCount - i), 1)) {
                 result.steps.push(i);
@@ -43,7 +45,7 @@ export class UnitTopologyService {
 
         return startingToplogyPoints.filter((point) => {            
             const totalValue = point.reduce((sum, coord) => sum + coord, 0);
-            return totalValue <= this.armyLimit && totalValue > 0;
+            return totalValue <= armyLimit && totalValue > 0;
         });
     }
 
@@ -63,13 +65,13 @@ export class UnitTopologyService {
                     return false;
                 }
 
-                if (this.armyLimit < point[i]) {
+                if (this.getArmyLimit() < point[i]) {
                     return false;
                 }
             }
 
             const totalValue = point.reduce((sum, coord) => sum + coord, 0);
-            return totalValue <= this.armyLimit && totalValue > 0;
+            return totalValue <= this.getArmyLimit() && totalValue > 0;
         });
     }
 
@@ -128,6 +130,10 @@ export class UnitTopologyService {
         else {
             return this.recursivelyMutatePoints(mutatedPoints, thisDimensionIndex + 1);
         }
+    }
+
+    private getArmyLimit(): number {
+        return SimulationSettingsService.getInstance().settings.generalCustodianEnabled ? 150 : 100;
     }
 }
 

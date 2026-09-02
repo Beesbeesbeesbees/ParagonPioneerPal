@@ -21,7 +21,7 @@
                                     <img [src]="getShipIcon(shipType)" [alt]="shipType" class="ship-icon" />
                                     {{ shipType }}
                                 </td>
-                                <td>{{ shipCatalog[shipType].tradeCapacity }}</td>
+                                <td>{{  getShipCapacity(shipType) | number: '1.0-2' }}</td>
                                 <td>
                                     <input
                                         class="form-control form-control-sm ship-count"

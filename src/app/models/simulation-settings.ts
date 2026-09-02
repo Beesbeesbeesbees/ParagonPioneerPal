@@ -11,6 +11,11 @@ export type SimulationSettings = {
 
     playerUnitValueInterface: HumanArmyInterface;
     enemyUnitValueInterface: EnemyArmyInterface;
+
+    berserkCustodianEnabled: boolean;
+    generalCustodianEnabled: boolean;
+    smugglerCustodianEnabled: boolean;
+    navigatorCustodianEnabled: boolean;
 };
 
 export class SimulationSettingDefaults {
@@ -24,7 +29,11 @@ export class SimulationSettingDefaults {
             maxInitialSims: 2000,
             maxThreads: null,
             playerUnitValueInterface: playerUnitValueInterface,
-            enemyUnitValueInterface: enemyUnitValueInterface
+            enemyUnitValueInterface: enemyUnitValueInterface,
+            berserkCustodianEnabled: false,
+            generalCustodianEnabled: false,
+            smugglerCustodianEnabled: false,
+            navigatorCustodianEnabled: false
         };
     }
 }

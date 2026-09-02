@@ -92,13 +92,17 @@ export class BattleResultAnalyzerService {
         };
     }
 
-    getBattleTimeInSeconds(playerArmy: ArmyDefinition, enemyArmy: ArmyDefinition, berserk: boolean): number {
+    getBattleTimeInSeconds(playerArmy: ArmyDefinition, enemyArmy: ArmyDefinition): number {
         let tierSum = 0;
         unitInfos.forEach(u => {
             tierSum += u.tier * ((playerArmy.filter(ut => ut.unit.name === u.name).map(ut => ut.count).reduce((a, b) => a + b, 0 || 0) + (enemyArmy.filter(ut => ut.unit.name === u.name).map(ut => ut.count).reduce((a, b) => a + b, 0 || 0))));
         })
         let result = Math.round(Math.pow(tierSum * 2, 1.4));
+
+        const berserk = SimulationSettingsService.getInstance().settings.berserkCustodianEnabled;
+
         if (berserk) result = Math.max(0, result - 2 * 60 * 60) / 2;
+        
         return Math.min(result, 8 * 60 * 60);
     }
 }

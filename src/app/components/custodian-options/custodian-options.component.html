@@ -1,0 +1,19 @@
+<h2>Custodian Options</h2>
+<table class="input-table">
+  <tr>
+    <td><label for="berserk">Berserk Enabled</label></td>
+    <td><input id="berserk" type="checkbox" [(ngModel)]="settings.berserkCustodianEnabled" (ngModelChange)="onUpdate.emit()" /></td>
+  </tr>
+  <tr>
+    <td><label for="general">General Enabled</label></td>
+    <td><input id="general" type="checkbox" [(ngModel)]="settings.generalCustodianEnabled" (ngModelChange)="onUpdate.emit()" /></td>
+  </tr>
+  <tr>
+    <td><label for="smuggler">Smuggler Enabled</label></td>
+    <td><input id="smuggler" type="checkbox" [(ngModel)]="settings.smugglerCustodianEnabled" (ngModelChange)="onUpdate.emit()" /></td>
+  </tr>
+  <tr>
+    <td><label for="navigator">Navigator Enabled</label></td>
+    <td><input id="navigator" type="checkbox" [(ngModel)]="settings.navigatorCustodianEnabled" (ngModelChange)="onUpdate.emit()" /></td>
+  </tr>
+</table>

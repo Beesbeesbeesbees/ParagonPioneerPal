@@ -201,45 +201,6 @@
         }
       </table>
     </span>
-    <span>
-      <h2>Simulation Options</h2>
-      <table class="input-table">
-        <tr>
-          <td>Win Threshold</td>
-          <td><input type="number" class="form-control" [(ngModel)]="simulationSettingsService.settings.winThreshold" min="0" step="0.0001"></td>
-        </tr>
-        <tr>
-          <td>Maximum Battle States Tracked</td>
-          <td><input type="number" class="form-control" [(ngModel)]="simulationSettingsService.settings.maxBattleStatesTracked" min="0" step="1"></td>
-        </tr>
-        <tr>
-          <td>Maximum Initial Simulations</td>
-          <td><input type="number" class="form-control" [(ngModel)]="simulationSettingsService.settings.maxInitialSims" min="0" step="1"></td>
-        </tr>
-        <tr>
-          <td>Maximum CPU Threads</td>
-          <td><input type="number" class="form-control" [(ngModel)]="simulationSettingsService.settings.maxThreads" min="1" step="1" required="false"></td>
-        </tr>
-        <tr>
-          <td colspan="2">For guaranteed winnable battles:</td>
-        </tr>
-        <tr>
-          <td>Hour of Battle Time : Unit Value Loss weight</td>
-          <td><input type="number" class="form-control" [(ngModel)]="simulationSettingsService.settings.winHourPerLossScoreWeight" min="0" step="0.0001"></td>
-        </tr>
-        <tr>
-          <td colspan="2">For non-guaranteed winnable battles:</td>
-        </tr>
-        <tr>
-          <td>Hour of Battle Time : Enemy Unit Value Killed weight</td>
-          <td><input type="number" class="form-control" [(ngModel)]="simulationSettingsService.settings.lossHourPerKillScoreWeight" min="0" step="0.0001"></td>
-        </tr>
-        <tr>
-          <td>Unit Value Loss : Enemy Unit Value Killed weight</td>
-          <td><input type="number" class="form-control" [(ngModel)]="simulationSettingsService.settings.lossLossScoreWeight" min="0" step="0.0001"></td>
-        </tr>
-      </table>
-      This simulator runs a lot faster in Chrome for some reason ¯\_(ツ)_/¯
-    </span>
+    <simulation-options (onUpdate)="onUpdate.emit()" />
   </div>
 </form>

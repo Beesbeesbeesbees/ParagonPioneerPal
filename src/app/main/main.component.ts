@@ -1,7 +1,7 @@
 import { DecimalPipe } from "@angular/common";
 import { Component, signal, WritableSignal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { BattleCalculatorComponent } from "../battle-calculator/battle-calculator.component";
+import { BattleCalculatorComponent } from "../components/battle-calculator/battle-calculator.component";
 import { Island } from "../models/island";
 import { populations, PopulationType } from "../models/population";
 import { SaveService } from "../services/save.service";
@@ -11,15 +11,16 @@ import { recipeIconMap, Recipe, recipes } from "../models/recipe";
 import { ProductionNode } from "../models/production-node";
 import { ProductionService } from "../services/production.service";
 import { TradeService } from "../services/trade.service";
-import { ShipManagementComponent } from "../ship-management/ship-management.component";
-import { GlobalSummaryComponent } from "../global-summary/global-summary.component";
+import { ShipManagementComponent } from "../components/ship-management/ship-management.component";
+import { GlobalSummaryComponent } from "../components/global-summary/global-summary.component";
+import { GlobalSettingsComponent } from "../components/global-settings/global-settings.component";
 import { IslandAggregatorService } from "../services/island-aggregator.service";
 import { DeleteWithConfirmationComponent } from "../widgets/delete-with-confirmation/delete-with-confirmation.component";
 import { SelectInputTextDirective } from "../widgets/select-input-text/select-input-text.directive";
 
 @Component({
   selector: 'app-main',
-  imports: [BattleCalculatorComponent, ShipManagementComponent, GlobalSummaryComponent, FormsModule, DecimalPipe, DeleteWithConfirmationComponent, SelectInputTextDirective],
+  imports: [BattleCalculatorComponent, ShipManagementComponent, GlobalSummaryComponent, GlobalSettingsComponent, FormsModule, DecimalPipe, DeleteWithConfirmationComponent, SelectInputTextDirective],
   templateUrl: './main.component.html',
   styleUrl: './main.component.scss',
 })
@@ -35,6 +36,7 @@ export class MainComponent {
   openCalculatorIsland: Island | null = null;
   openShipManagementProduction: ProductionNode | null = null;
   globalSummaryOpen = false;
+  globalSettingsOpen = false;
   
   populations = populations;
   productIconMap = productIconMap;
@@ -100,6 +102,10 @@ export class MainComponent {
 
   closeGlobalSummary() {
     this.globalSummaryOpen = false;
+  }
+
+  closeGlobalSettings() {
+    this.globalSettingsOpen = false;
   }
 
   get filteredRecipes(): Recipe[] {

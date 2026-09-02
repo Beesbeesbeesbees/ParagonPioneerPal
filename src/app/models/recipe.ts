@@ -131,7 +131,7 @@ export const recipes: Recipe[] = [
         name: 'Pioneer Dwelling',
         productType: 'Militia',
         productAmount: 1,
-        productionPerHour: 1.5,
+        productionPerHour: 3,
         fieldCount: null,
         ingredients: []
     },

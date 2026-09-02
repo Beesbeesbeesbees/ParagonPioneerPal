@@ -1,0 +1,16 @@
+@if (isOpen) {
+    <div class="modal-backdrop" role="presentation" (click)="closeModal()">
+        <section class="settings-modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <span>&nbsp;</span>
+                <button type="button" class="btn btn-sm btn-outline-secondary" aria-label="Close" title="Close" (click)="closeModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="settings-panels">
+                <simulation-options (onUpdate)="onUpdate.emit()"></simulation-options>
+                <custodian-options (onUpdate)="onUpdate.emit()"></custodian-options>
+            </div>
+        </section>
+    </div>
+}

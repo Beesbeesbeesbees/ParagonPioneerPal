@@ -1,17 +1,18 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ArmyInterfaces, EnemyArmyInterface, HumanArmyInterface } from '../models/army-interface';
-import { UnitInfo, unitInfoByName } from '../models/unitTypes';
+import { ArmyInterfaces, EnemyArmyInterface, HumanArmyInterface } from '../../models/army-interface';
+import { UnitInfo, unitInfoByName } from '../../models/unitTypes';
 import { DecimalPipe, KeyValue, KeyValuePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ArmyDefinition } from '../models/army';
-import { SimulationManagerService } from '../services/simulation-manager.service';
-import { Simulation } from '../models/simulation';
-import { SimulationSettingsService } from '../services/simulation-settings.service';
-import { SelectInputTextDirective } from '../widgets/select-input-text/select-input-text.directive';
+import { ArmyDefinition } from '../../models/army';
+import { SimulationManagerService } from '../../services/simulation-manager.service';
+import { Simulation } from '../../models/simulation';
+import { SimulationSettingsService } from '../../services/simulation-settings.service';
+import { SelectInputTextDirective } from '../../widgets/select-input-text/select-input-text.directive';
+import { SimulationOptionsComponent } from '../simulation-options/simulation-options.component';
 
 @Component({
   selector: 'battle-calculator',
-  imports: [KeyValuePipe, DecimalPipe, FormsModule, SelectInputTextDirective],
+  imports: [KeyValuePipe, DecimalPipe, FormsModule, SelectInputTextDirective, SimulationOptionsComponent],
   templateUrl: './battle-calculator.component.html',
   styleUrl: './battle-calculator.component.scss',
 })

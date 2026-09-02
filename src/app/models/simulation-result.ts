@@ -46,7 +46,7 @@ export class SimulationResultAggregated implements SimulationResult {
         this.weightedWinScore = 0;
         this.weightedLossScore = 0;
         
-        this.battleSeconds = BattleResultAnalyzerService.getInstance().getBattleTimeInSeconds(this.playerArmy, this.enemyArmy, false);
+        this.battleSeconds = BattleResultAnalyzerService.getInstance().getBattleTimeInSeconds(this.playerArmy, this.enemyArmy);
         this.battleSecondsFriendlyText = SimulationResultAggregated.formatSeconds(this.battleSeconds);
 
         for (const [key, result] of simResult.results.entries()) {

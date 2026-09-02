@@ -63,7 +63,7 @@ export class ArmyInterfaces {
 
     static getDefaultHumanValues(): HumanArmyInterface {
         return {
-            "Militia": 1,
+            "Militia": 0.5,
             "Archer": 1,
             "Footsoldier": 1,
             "Longbow Archer": 2,
